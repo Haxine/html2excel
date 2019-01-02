@@ -36,15 +36,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -124,7 +116,24 @@ public class DefaultExcelBuilder {
         return this;
     }
 
+    /**
+     * 构建
+     *
+     * @param data 数据
+     * @return workbook
+     */
     public Workbook build(List<?> data) {
+        return this.build(data, null);
+    }
+
+    /**
+     * 选定分组构建
+     *
+     * @param data  数据
+     * @param group 分组
+     * @return workbook
+     */
+    public Workbook build(List<?> data, Class<?> group) {
         if (Objects.isNull(data) || data.isEmpty()) {
             log.info("No valid data exists");
             return new HtmlToExcelFactory().build(Collections.emptyList());
@@ -135,7 +144,7 @@ public class DefaultExcelBuilder {
             return new HtmlToExcelFactory().build(Collections.emptyList());
         }
         ClassFieldContainer classFieldContainer = ReflectUtil.getAllFieldsOfClass(findResult.get().getClass());
-        List<Field> sortedFields = getSortedFieldsAndSetting(classFieldContainer);
+        List<Field> sortedFields = getSortedFieldsAndSetting(classFieldContainer, group);
 
         if (sortedFields.isEmpty()) {
             log.info("The specified field mapping does not exist");
@@ -155,7 +164,7 @@ public class DefaultExcelBuilder {
      * @param classFieldContainer classFieldContainer
      * @return Field
      */
-    private List<Field> getSortedFieldsAndSetting(ClassFieldContainer classFieldContainer) {
+    private List<Field> getSortedFieldsAndSetting(ClassFieldContainer classFieldContainer, Class<?> group) {
         ExcelTable excelTable = classFieldContainer.getClazz().getAnnotation(ExcelTable.class);
 
         boolean excludeParent = false;
@@ -173,6 +182,7 @@ public class DefaultExcelBuilder {
             } else {
                 preelectionFields = classFieldContainer.getFields();
             }
+            preelectionFields = getGroupFields(group, preelectionFields);
         } else {
             if (excludeParent) {
                 preelectionFields = classFieldContainer.getDeclaredFields().stream()
@@ -180,6 +190,7 @@ public class DefaultExcelBuilder {
             } else {
                 preelectionFields = classFieldContainer.getFieldsByAnnotation(ExcelColumn.class);
             }
+            preelectionFields = getGroupFields(group, preelectionFields);
 
             if (preelectionFields.isEmpty()) {
                 if (Objects.isNull(fieldDisplayOrder) || fieldDisplayOrder.isEmpty()) {
@@ -230,6 +241,27 @@ public class DefaultExcelBuilder {
             this.titles = titles;
         }
         return sortedFields;
+    }
+
+    /**
+     * 获取分组字段
+     *
+     * @param group             分组
+     * @param preelectionFields 预选字段
+     * @return 字段集合
+     */
+    private List<Field> getGroupFields(Class<?> group, List<Field> preelectionFields) {
+        if (Objects.isNull(group)) {
+            return preelectionFields;
+        }
+        return preelectionFields.stream().filter(field -> {
+            ExcelColumn excelColumn = field.getAnnotation(ExcelColumn.class);
+            if (Objects.isNull(excelColumn)) {
+                return false;
+            }
+            Class<?>[] groups = excelColumn.groups();
+            return Arrays.asList(groups).contains(group);
+        }).collect(Collectors.toList());
     }
 
     /**

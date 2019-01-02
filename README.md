@@ -13,7 +13,7 @@ https://github.com/liaochong/html2excel/wiki
 ------------------
 - **零学习成本**：使用html作为模板，学习成本几乎为零；
 - **可生成任意复杂表格**：本工具使用迭代单元格方式进行excel绘制，可生成任意复杂度excel；
-- **支持常用背景色、边框、字体等样式设置**：具体参见下方Style-support（样式支持）部分；
+- **支持常用背景色、边框、字体等样式设置**：具体参见上方文档内Style-support（样式支持）部分；
 - **支持.XLS、.XLSX**：支持生成.xls、.xlsx后缀的excel；
 - **支持低内存SXSSF模式**：支持低内存的SXSSF模式，可利用极低的内存生成.xlsx；
 - **屏蔽POI操作**：不直接操作过重的POI；
@@ -27,7 +27,7 @@ https://github.com/liaochong/html2excel/wiki
 * Email：liaochong8950@163.com
 * Issue：[issues](https://github.com/liaochong/html2excel/issues)
 
-> 如本项目对您有所帮助，还请点击上方star或者在下方扫码支付任意金额以鼓励作者更好地开发，谢谢！
+> 如本项目对您有所帮助，烦请点击上方star或者在下方扫码支付任意金额以鼓励作者更好地开发，十分感谢您的关注！
 
 <p>
     <img src="https://www.liaochong.site/images/alipay.jpg" height="250"/>
